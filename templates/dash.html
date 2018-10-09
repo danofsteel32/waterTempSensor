@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript">
+
+			var DEVICE_ID = 'water_temp1';
+			var INTERVAL = 'hour';
+			var CHART_URL = '/charts/' + DEVICE_ID + '/' + INTERVAL;
+
+			function query() {
+						$.ajax({
+					        url: "/query",
+					        type: "POST",
+					        success: function (result) {
+					            var obj = JSON.parse(result);
+					            var time = obj.time;
+					            var sensor = obj.device;
+					            var data_type = obj.data_type;
+					            var data_value = obj.data_value;
+
+					            $('#div_time').text(time);
+					            $('#div_sensor').text('Sensor: ' + sensor);
+					            $('#div_data').text(data_type + ': ' + data_value);
+					        },
+					        error: function (xhr, ajaxOptions, thrownError) {
+					        	$('div_time').text('--------');
+					        	$('div_sensor').text('Sensor: --');
+					        	$('div_data').text('--: --');
+					        }
+					    });
+
+		    			setTimeout(function(){ query(); }, 2000);
+		    		}
+
+		    		function refresh_chart() {
+		    			$('#img_chart').attr('src', CHART_URL)
+		    			setTimeout(function(){ refresh_chart(); }, 60000);
+		    		}
+
+		    		function set_chart_device_id(device_id) {
+		    			DEVICE_ID = device_id;
+		    			CHART_URL = '/charts/' + DEVICE_ID + '/' + INTERVAL;
+		    			$('#img_chart').attr('src', CHART_URL)
+		    		}
+
+		    		function set_chart_interval(interval) {
+		    			INTERVAL = interval;
+		    			CHART_URL = '/charts/' + DEVICE_ID + '/' + INTERVAL;
+		    			$('#img_chart').attr('src', CHART_URL)
+		    		}
+
+			$(document).ready(function() {
+					    $('.a_type').click(function(){
+							$('.a_type').css('color', 'blue');
+							$('.a_type').css('text-decoration', 'underline');
+							$(this).css('color', 'black');
+							$(this).css('text-decoration', 'none');
+						});
+						$('.a_type').first().css('color', 'black');
+						$('.a_type').first().css('text-decoration', 'none');
+						$('.a_time').click(function(){
+							$('.a_time').css('color', 'blue');
+							$('.a_time').css('text-decoration', 'underline');
+							$(this).css('color', 'black');
+							$(this).css('text-decoration', 'none');
+						});
+						$('.a_time').first().css('color', 'black');
+						$('.a_time').first().css('text-decoration', 'none');
+					    query();
+					    refresh_chart();
+					});
+	</script>
+</head>
+<body style="margin-left: 16px">
+	<div style="float: left; margin-left: 24px; margin-top: 8px">
+		<div id="div_time" style="font-size:28px; margin-top: 6px; margin-bottom: 16px">
+		– – / - -
+		</div>
+		<div id="div_sensor" style="font-size:28px; margin-top: 6px; margin-bottom: 16px">
+		– – / - -
+		</div>
+		<div id="div_data" style="font-size:28px; margin-top: 6px; margin-bottom: 16px">
+		– – / - -
+		</div>
+	</div>
+	<div style="float: right">
+		<img id="img_chart" src="/charts/water_temp1/day"></img>
+			<div style="float: bottom; margin-left: 48px; margin-right: 32px; margin-top:32px;">
+				<div style="float: left">
+					<a class="a_type" href="javascript:set_chart_device_id('water_temp1')">Water_Temp1</a>
+				</div>
+
+				<div style="float: right">
+					<a class="a_time" href="javascript:set_chart_interval('hour')">Hour</a>
+					<a class="a_time" href="javascript:set_chart_interval('day')">Day</a>
+					<a class="a_time" href="javascript:set_chart_interval('week')">Week</a>
+				</div><br><br>
+			</div>
+	</div>
+</body>
